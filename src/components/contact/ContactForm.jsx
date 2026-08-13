@@ -25,13 +25,11 @@ export default function ContactForm() {
     setAlertMsg('')
 
     try {
-      // তোমার API এর সঠিক URL এখানে দিবে
-      const response = await axios.post('http://127.0.0.1:8000/api/contact-store', formData)
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/contact-store`, formData)
       
       if (response.data.success) {
         setAlertType('success')
         setAlertMsg(response.data.message)
-        // ফর্ম রিসেট করা
         setFormData({
           name: '', phone: '', email: '', user_type: 'Corporate Employer (Seeking Workers)', subject: '', message: ''
         })

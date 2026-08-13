@@ -9,6 +9,7 @@ import ServicesPage from './pages/ServicesPage'
 import EmployersPage from './pages/EmployersPage'
 import ContactPage from './pages/ContactPage'
 import LicensesPage from './pages/LicensesPage'
+import ComingSoonPage from './pages/ComingSoonPage'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
       <Route path="/employers" element={<EmployersPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route path="/licenses" element={<LicensesPage />} />
+      <Route path="*" element={<ComingSoonPage />} />
     </Routes>
   )
 }
