@@ -9,8 +9,6 @@ function ServiceCard({ service }) {
         </div>
         <h4 className="fw-bold text-navy">{title}</h4>
         <p className="text-muted">{description}</p>
-        
-        {/* API থেকে আসা HTML স্ট্রিং এখানে রেন্ডার হচ্ছে */}
         <div className="check-list" dangerouslySetInnerHTML={{ __html: features }} />
       </div>
     </div>
@@ -18,17 +16,13 @@ function ServiceCard({ service }) {
 }
 
 export default function ServiceGrid({ services }) {
-  if (!services || services.length === 0) return null
+  const list = Array.isArray(services) ? services : (services?.data || [])
+  if (!list || list.length === 0) return null
 
   return (
     <div className="row g-4">
-      {services.map(function (service) {
-        return (
-          <ServiceCard 
-            key={service.id} 
-            service={service} 
-          />
-        )
+      {list.map(function (service) {
+        return <ServiceCard key={service.id} service={service} />
       })}
     </div>
   )

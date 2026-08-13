@@ -1,6 +1,5 @@
 function TrackRecordCard({ record }) {
   const { badge_text, title, description, footer_text } = record
-
   return (
     <div className="col-md-6 col-lg-4">
       <div className="p-4 border rounded-4 bg-white shadow-sm h-100">
@@ -14,11 +13,12 @@ function TrackRecordCard({ record }) {
 }
 
 export default function TrackRecordsGrid({ records }) {
-  if (!records || records.length === 0) return null
+  const list = Array.isArray(records) ? records : (records?.data || [])
+  if (!list || list.length === 0) return null
 
   return (
     <div className="row g-4">
-      {records.map(function (record) {
+      {list.map(function (record) {
         return <TrackRecordCard key={record.id} record={record} />
       })}
     </div>

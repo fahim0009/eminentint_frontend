@@ -1,8 +1,6 @@
 function IndustryCard({ industry, onOpenDemand }) {
   const iconClass = industry.icon || 'bi bi-building'
   const iconColor = industry.icon_color || 'text-navy'
-  
-  // Using default English fields directly from the API response
   const title = industry.title || ''
   const description = industry.description || ''
   const buttonText = industry.button_text || 'Request Staff'
@@ -27,11 +25,13 @@ function IndustryCard({ industry, onOpenDemand }) {
 }
 
 export default function IndustryGrid({ industries, onOpenDemand }) {
-  if (!industries || industries.length === 0) return null
+  const list = Array.isArray(industries) ? industries : (industries?.data || [])
+  
+  if (!list || list.length === 0) return null
 
   return (
     <div className="row g-4">
-      {industries.map(function (industry) {
+      {list.map(function (industry) {
         return (
           <IndustryCard
             key={industry.id}

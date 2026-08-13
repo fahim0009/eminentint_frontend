@@ -1,6 +1,5 @@
 function AdvantageCard({ advantage }) {
   const { icon, icon_color, title, description } = advantage
-
   return (
     <div className="col-md-6 col-lg-3">
       <div className="p-4 bg-white border rounded-4 shadow-sm text-center h-100">
@@ -13,11 +12,12 @@ function AdvantageCard({ advantage }) {
 }
 
 export default function AdvantageGrid({ advantages }) {
-  if (!advantages || advantages.length === 0) return null
+  const list = Array.isArray(advantages) ? advantages : (advantages?.data || [])
+  if (!list || list.length === 0) return null
 
   return (
     <div className="row g-4">
-      {advantages.map(function (advantage) {
+      {list.map(function (advantage) {
         return <AdvantageCard key={advantage.id} advantage={advantage} />
       })}
     </div>
