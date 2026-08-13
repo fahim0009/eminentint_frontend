@@ -22,8 +22,8 @@ export default function Footer() {
             </p>
             <div className="top-bar-social mt-3">
               {['facebook-f', 'twitter', 'linkedin-in', 'youtube', 'whatsapp'].map((icon) => (
-                <a key={icon} href="#">
-                  <i className={'fab fa-' + icon}></i>
+                <a key={icon} href="#" aria-label={icon}>
+                  <i className={'fa-brands fa-' + icon}></i>
                 </a>
               ))}
             </div>

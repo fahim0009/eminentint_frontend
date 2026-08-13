@@ -1,3 +1,6 @@
+import employerImg from '../../assets/images/saudi_employer_1785857965458.jpg'
+import jobseekerImg from '../../assets/images/skilled_workers_1785857981972.jpg'
+
 export default function DualFeatureSection({ onOpenDemandModal }) {
   return (
     <section className="section-padding bg-light">
@@ -7,7 +10,7 @@ export default function DualFeatureSection({ onOpenDemandModal }) {
             <div className="dual-feature-card">
               <div className="dual-feature-img-wrapper">
                 <img
-                  src="/src/assets/images/saudi_employer_1785857965458.jpg"
+                  src={employerImg}
                   alt="Saudi Employer Handshake"
                   className="dual-feature-img"
                 />
@@ -43,7 +46,7 @@ export default function DualFeatureSection({ onOpenDemandModal }) {
             <div className="dual-feature-card jobseeker-card">
               <div className="dual-feature-img-wrapper">
                 <img
-                  src="/src/assets/images/skilled_workers_1785857981972.jpg"
+                  src={jobseekerImg}
                   alt="Bangladeshi Skilled Workers"
                   className="dual-feature-img"
                 />
