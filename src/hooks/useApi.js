@@ -1,46 +1,49 @@
 import { useState, useEffect } from 'react'
-import api from '../api/axios'
+import axios from 'axios'
 
-export function useApi(url, options = {}) {
-  const { manual = false, params = null } = options
-  const [data, setData] = useState(null)
-  const [loading, setLoading] = useState(!manual)
-  const [error, setError] = useState(null)
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
 
-  const fetchData = async (overrideParams) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await api.get(url, {
-        params: overrideParams || params,
-      })
-      setData(response.data)
-    } catch (err) {
-      setError(err.response?.data?.message || err.message)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    if (!manual) {
-      fetchData()
-    }
-  }, [url])
-
-  return { data, loading, error, refetch: fetchData }
+const buildUrl = (endpoint) => {
+  if (endpoint.startsWith('http')) return endpoint
+  return `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : '/' + endpoint}`
 }
 
-export function usePost(url) {
+export function useApi(endpoint) {
+  const [data, setData] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true)
+      try {
+        const url = buildUrl(endpoint)
+        const response = await axios.get(url)
+        setData(response.data)
+      } catch (err) {
+        setError(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchData()
+  }, [endpoint])
+
+  return { data, loading, error }
+}
+
+export function usePost() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [response, setResponse] = useState(null)
 
-  const postData = async (payload) => {
+  const postData = async (url, payload) => {
     setLoading(true)
     setError(null)
     try {
-      const res = await api.post(url, payload)
+      const fullUrl = buildUrl(url)
+      const res = await axios.post(fullUrl, payload)
       setResponse(res.data)
       return res.data
     } catch (err) {
