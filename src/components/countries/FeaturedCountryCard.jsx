@@ -1,5 +1,9 @@
 export default function FeaturedCountryCard({ country, onDemand }) {
   const jobLink = country.job_link?.replace('jobs.html', '/jobs') || '/jobs'
+  
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
+  const LARAVEL_URL = API_BASE_URL.replace('/api', '')
+  const countryImage = country.image ? `${LARAVEL_URL}${country.image}` : null
 
   return (
     <div className="p-4 p-md-5 bg-white border border-2 border-navy rounded-4 shadow-sm">
@@ -48,17 +52,15 @@ export default function FeaturedCountryCard({ country, onDemand }) {
           </div>
         </div>
 
-        {country.image ? (
-          <div className="col-md-4 text-center">
-            <img src={country.image} alt={country.name} className="img-fluid rounded-3 shadow" />
-          </div>
-        ) : (
-          <div className="col-md-4 text-center">
+        <div className="col-md-4 text-center">
+          {countryImage ? (
+            <img src={countryImage} alt={country.name} className="img-fluid rounded-3 shadow" />
+          ) : (
             <div className="d-flex align-items-center justify-content-center rounded-3 bg-light" style={{ height: '220px' }}>
               <span style={{ fontSize: '6rem' }}>{country.flag}</span>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   )
