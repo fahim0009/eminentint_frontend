@@ -1,48 +1,23 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useCallback } from 'react'
 
 function getYoutubeEmbedUrl(url) {
   const match = url?.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]+)/)
   return match ? `https://www.youtube.com/embed/${match[1]}?autoplay=1` : url
 }
 
-export default function GalleryLightbox({ items, index, setIndex }) {
-  const modalRef = useRef(null)
-  const bsModal = useRef(null)
+// Laravel বেস URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
+const LARAVEL_URL = API_BASE_URL.replace('/api', '')
 
+function getMediaUrl(url) {
+  if (!url) return ''
+  if (url.startsWith('http') || url.startsWith('https://img.youtube.com')) return url
+  return `${LARAVEL_URL}${url}`
+}
+
+export default function GalleryLightbox({ items, index, setIndex }) {
   const isOpen = index !== null && items[index]
 
-  // 1. Initialize Bootstrap modal instance (runs once)
-  useEffect(() => {
-    if (!modalRef.current || !window.bootstrap) return
-    bsModal.current = new window.bootstrap.Modal(modalRef.current)
-    return () => {
-      if (bsModal.current) {
-        bsModal.current.dispose()
-        bsModal.current = null
-      }
-    }
-  }, [])
-
-  // 2. Show/hide when index changes
-  useEffect(() => {
-    if (!bsModal.current) return
-    if (isOpen) {
-      bsModal.current.show()
-    } else {
-      bsModal.current.hide()
-    }
-  }, [isOpen])
-
-  // 3. Sync Bootstrap hide event back to React state
-  useEffect(() => {
-    const el = modalRef.current
-    if (!el) return
-    const handleHidden = () => setIndex(null)
-    el.addEventListener('hidden.bs.modal', handleHidden)
-    return () => el.removeEventListener('hidden.bs.modal', handleHidden)
-  }, [setIndex])
-
-  // 4. Keyboard navigation
   const goPrev = useCallback(() => {
     setIndex((prev) => {
       if (prev === null) return null
@@ -57,35 +32,54 @@ export default function GalleryLightbox({ items, index, setIndex }) {
     })
   }, [items.length])
 
+  // কীবোর্ড ও বডি স্ক্রল কন্ট্রোল
   useEffect(() => {
     if (!isOpen) return
+    
     const handleKey = (e) => {
       if (e.key === 'Escape') setIndex(null)
       if (e.key === 'ArrowLeft') goPrev()
       if (e.key === 'ArrowRight') goNext()
     }
+    
     window.addEventListener('keydown', handleKey)
-    return () => window.removeEventListener('keydown', handleKey)
-  }, [isOpen, goPrev, goNext])
+    document.body.style.overflow = 'hidden' // ব্যাকগ্রাউন্ড স্ক্রল বন্ধ করা
 
-  // ALL hooks are above this line — no hooks after conditional return
+    return () => {
+      window.removeEventListener('keydown', handleKey)
+      document.body.style.overflow = '' // স্ক্রল আবার চালু করা
+    }
+  }, [isOpen, goPrev, goNext, setIndex])
+
+  // যদি কোনো ইমেজ সিলেক্ট করা না থাকে, তবে কিছুই রেন্ডার করবে না
   if (!isOpen) return null
 
   const item = items[index]
   const isYoutube = item.media_type === 'youtube'
   const isVideo = item.media_type === 'video'
+  const mediaUrl = getMediaUrl(item.media_url)
 
   return (
-    <div className="modal fade" ref={modalRef} tabIndex="-1" aria-hidden="true">
-      <div className="modal-dialog modal-xl modal-dialog-centered">
+    // ব্যাকড্রপ (কালো ব্যাকগ্রাউন্ড)
+    <div 
+      className="modal fade show d-block" 
+      tabIndex="-1" 
+      aria-hidden="true"
+      style={{ backgroundColor: 'rgba(0, 0, 0, 0.9)' }}
+      onClick={() => setIndex(null)} // বাইরে ক্লিক করলে বন্ধ হবে
+    >
+      <div 
+        className="modal-dialog modal-xl modal-dialog-centered"
+        onClick={(e) => e.stopPropagation()} // ভেতরে ক্লিক করলে বন্ধ হবে না
+      >
         <div className="modal-content lightbox-modal-content">
-
+          
           <div className="modal-header border-bottom border-white border-opacity-10 py-3 px-4 d-flex justify-content-between align-items-center">
             <div>
               <span className="badge bg-gold text-navy fw-bold me-2">
                 {isYoutube ? 'YOUTUBE' : isVideo ? 'VIDEO' : 'PHOTO'}
               </span>
-              <span className="badge bg-white bg-opacity-20 text-white">
+              <span className="badge bg-opacity-20 text-white">
                 {item.category?.name || 'Gallery'}
               </span>
             </div>
@@ -110,14 +104,14 @@ export default function GalleryLightbox({ items, index, setIndex }) {
                 </div>
               ) : isVideo ? (
                 <video
-                  src={item.media_url}
+                  src={mediaUrl}
                   controls
                   autoPlay
                   className="lightbox-video"
                 ></video>
               ) : (
                 <img
-                  src={item.media_url}
+                  src={mediaUrl}
                   alt={item.title}
                   className="lightbox-image"
                 />
@@ -137,7 +131,10 @@ export default function GalleryLightbox({ items, index, setIndex }) {
                 </span>
               </div>
               {item.description && (
-                <p className="small text-light opacity-50 mt-1 mb-0">{item.description}</p>
+                <div 
+                  className="small text-light opacity-50 mt-1 mb-0" 
+                  dangerouslySetInnerHTML={{ __html: item.description }} 
+                />
               )}
             </div>
             <div className="d-flex align-items-center gap-2">
@@ -152,7 +149,7 @@ export default function GalleryLightbox({ items, index, setIndex }) {
               </button>
             </div>
           </div>
-
+          
         </div>
       </div>
     </div>

@@ -3,18 +3,29 @@ function getYoutubeVideoId(url) {
   return match ? match[1] : null
 }
 
+// Laravel বেস URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
+const LARAVEL_URL = API_BASE_URL.replace('/api', '')
+
+function getMediaUrl(url) {
+  if (!url) return ''
+  if (url.startsWith('http') || url.startsWith('https://img.youtube.com')) return url
+  return `${LARAVEL_URL}${url}`
+}
+
 function GalleryCard({ item, onOpen, index }) {
   const isYoutube = item.media_type === 'youtube'
   const isVideo = item.media_type === 'video'
   const videoId = isYoutube ? getYoutubeVideoId(item.media_url) : null
+  
+  // ইউটিউব থাম্বনেইল বা সাধারণ ইমেজের URL ঠিক করা হলো
   const thumbnail = isYoutube
     ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
-    : item.media_url
+    : getMediaUrl(item.media_url)
 
   return (
     <div className="col-6 col-md-4 col-lg-3" onClick={() => onOpen(index)}>
       <div className="gallery-card">
-        {/* তোমার আসল CSS অনুযায়ী class নাম */}
         <div className="gallery-thumb-container">
           <img
             src={thumbnail}

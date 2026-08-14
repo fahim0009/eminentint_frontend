@@ -9,7 +9,6 @@ export default function GalleryFilters({
   return (
     <div className="p-4 bg-white border rounded-4 shadow-sm mb-4">
       <div className="row g-3 align-items-center">
-        {/* Search */}
         <div className="col-lg-4">
           <div className="input-group">
             <span className="input-group-text bg-white border-end-0 text-muted">
@@ -25,7 +24,6 @@ export default function GalleryFilters({
           </div>
         </div>
 
-        {/* Media Type Filter */}
         <div className="col-md-6 col-lg-3">
           <div className="d-flex align-items-center gap-2">
             <label className="form-label mb-0 small fw-bold text-navy text-nowrap">Media Type:</label>
@@ -42,7 +40,6 @@ export default function GalleryFilters({
           </div>
         </div>
 
-        {/* Order Filter */}
         <div className="col-md-6 col-lg-3">
           <div className="d-flex align-items-center gap-2">
             <label className="form-label mb-0 small fw-bold text-navy text-nowrap">Sort By:</label>
@@ -59,7 +56,6 @@ export default function GalleryFilters({
           </div>
         </div>
 
-        {/* Item Count Badge */}
         <div className="col-lg-2 text-lg-end">
           <span className="badge bg-navy px-3 py-2">
             Showing {itemCount} Item{itemCount !== 1 ? 's' : ''}
@@ -67,7 +63,6 @@ export default function GalleryFilters({
         </div>
       </div>
 
-      {/* Category Pills */}
       <div className="d-flex flex-wrap gap-2 mt-3 pt-3 border-top">
         <button
           className={`gallery-category-pill${activeCategory === 'all' ? ' active' : ''}`}
@@ -75,15 +70,20 @@ export default function GalleryFilters({
         >
           <i className="bi bi-grid-fill me-1"></i> All Categories
         </button>
-        {categories.map((cat) => (
-          <button
-            key={cat.id}
-            className={`gallery-category-pill${activeCategory === cat.slug ? ' active' : ''}`}
-            onClick={() => setActiveCategory(cat.slug)}
-          >
-            <i className={`bi ${cat.icon} me-1`}></i> {cat.name}
-          </button>
-        ))}
+        {categories.map((cat) => {
+          // আইকন ক্লাস ঠিক করা হলো যাতে 'bi' দুইবার না বসে
+          const iconClass = cat.icon?.startsWith('bi ') ? cat.icon : `bi ${cat.icon || 'bi-tag'}`
+          
+          return (
+            <button
+              key={cat.id}
+              className={`gallery-category-pill${activeCategory === cat.slug ? ' active' : ''}`}
+              onClick={() => setActiveCategory(cat.slug)}
+            >
+              <i className={`${iconClass} me-1`}></i> {cat.name}
+            </button>
+          )
+        })}
       </div>
     </div>
   )

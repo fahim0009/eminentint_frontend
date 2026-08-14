@@ -12,28 +12,26 @@ import { useApi } from '../hooks/useApi'
 
 export default function GalleryPage() {
   const { data: response, loading } = useApi('/galleries')
+  const { data: catResponse, loading: catLoading } = useApi('/gallery-categories')
+  
   const galleries = response?.data || []
+  
+  // ক্যাটাগরি আলাদাভাবে API থেকে নিচ্ছি যাতে সব ক্যাটাগরি দেখায়
+  const categories = useMemo(() => {
+    if (!catResponse?.data) return []
+    return catResponse.data.map(cat => ({
+      id: cat.id,
+      name: cat.name,
+      slug: cat.slug,
+      icon: cat.icon_class
+    }))
+  }, [catResponse])
 
   const [search, setSearch] = useState('')
   const [mediaType, setMediaType] = useState('all')
   const [orderBy, setOrderBy] = useState('category-asc')
   const [activeCategory, setActiveCategory] = useState('all')
   const [lightboxIndex, setLightboxIndex] = useState(null)
-
-  const categories = useMemo(() => {
-    const map = new Map()
-    galleries.forEach((item) => {
-      if (item.category && !map.has(item.category.id)) {
-        map.set(item.category.id, {
-          id: item.category.id,
-          name: item.category.name,
-          slug: item.category.slug,
-          icon: item.category.icon_class,
-        })
-      }
-    })
-    return Array.from(map.values()).sort((a, b) => a.id - b.id)
-  }, [galleries])
 
   const stats = useMemo(() => ({
     photos: galleries.filter((g) => g.media_type === 'image').length,
