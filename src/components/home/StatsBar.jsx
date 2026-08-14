@@ -43,7 +43,10 @@ function AnimatedCounter({ target, suffix = '' }) {
 }
 
 export default function StatsBar() {
-  const { data: stats, loading } = useApi('/hero-stats')
+  const { data: response, loading } = useApi('/hero-stats')
+  
+  
+  const stats = response?.data || []
 
   if (loading) {
     return (
@@ -65,14 +68,15 @@ export default function StatsBar() {
     { icon: 'bi-award-fill', label: 'Visa Success Rate', count: 98, suffix: '%', color: 'text-gold', textColor: 'text-maroon' },
   ]
 
-  const items = stats?.length > 0
+  
+  const items = stats.length > 0
     ? stats.map((s) => ({
         icon: s.icon || 'bi-bar-chart-fill',
-        label: s.label,
-        count: Number(s.value) || 0,
+        label: s.label || '',
+        count: Number(s.number) || 0, 
         suffix: s.suffix || '+',
-        color: s.color || 'text-navy',
-        textColor: s.text_color || '',
+        color: s.icon_color || 'text-navy', 
+        textColor: '', 
       }))
     : defaultStats
 
@@ -80,21 +84,26 @@ export default function StatsBar() {
     <div className="container">
       <div className="stats-floating-bar">
         <div className="row g-3 text-center text-md-start">
-          {items.map((item, i) => (
-            <div key={i} className="col-6 col-md-4 col-lg">
-              <div className="stat-item">
-                <div className="stat-icon-wrapper">
-                  <i className={`bi ${item.icon} ${item.color}`}></i>
-                </div>
-                <div>
-                  <div className={`stat-number ${item.textColor}`}>
-                    <AnimatedCounter target={item.count} suffix={item.suffix} />
+          {items.map((item, i) => {
+            
+            const iconClass = item.icon?.startsWith('bi ') ? item.icon : `bi ${item.icon}`
+            
+            return (
+              <div key={i} className="col-6 col-md-4 col-lg">
+                <div className="stat-item">
+                  <div className="stat-icon-wrapper">
+                    <i className={`${iconClass} ${item.color}`}></i>
                   </div>
-                  <div className="stat-label">{item.label}</div>
+                  <div>
+                    <div className={`stat-number ${item.textColor || ''}`}>
+                      <AnimatedCounter target={item.count} suffix={item.suffix} />
+                    </div>
+                    <div className="stat-label">{item.label}</div>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
     </div>
