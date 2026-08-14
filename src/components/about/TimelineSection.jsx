@@ -7,13 +7,13 @@ var timelineData = [
   { year: '2026', badge: 'bg-success', title: 'Saudi Licensed Company', desc: 'Obtained official Saudi CR and Trading License for direct staffing.' },
 ]
 
-export default function TimelineSection() {
+export default function TimelineSection({ data, loading }) {
   return (
     <section className="section-padding bg-white">
       <div className="container">
         <div className="text-center mb-5">
-          <span className="section-tagline">Our Journey</span>
-          <h2 className="section-title">Company Timeline (2021 - 2026)</h2>
+          <span className="section-tagline">{data?.timeline_tag || 'Our Journey'}</span>
+          <h2 className="section-title">{data?.timeline_title || 'Company Timeline (2021 - 2026)'}</h2>
         </div>
 
         <div className="row g-4 position-relative">
