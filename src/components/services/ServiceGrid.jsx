@@ -1,4 +1,6 @@
 function ServiceCard({ service }) {
+  if (!service) return null
+
   const { icon, icon_color, anchor_id, title, description, features } = service
 
   return (
@@ -8,8 +10,14 @@ function ServiceCard({ service }) {
           <i className={(icon || 'bi bi-gear') + ' fs-2'}></i>
         </div>
         <h4 className="fw-bold text-navy">{title}</h4>
-        <p className="text-muted">{description}</p>
-        <div className="check-list" dangerouslySetInnerHTML={{ __html: features }} />
+        
+        {description && (
+          <div className="text-muted" dangerouslySetInnerHTML={{ __html: description }} />
+        )}
+        
+        {features && (
+          <div className="check-list mt-2" dangerouslySetInnerHTML={{ __html: features }} />
+        )}
       </div>
     </div>
   )
