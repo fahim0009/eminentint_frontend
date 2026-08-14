@@ -1,7 +1,27 @@
 import { useApi } from '../../hooks/useApi'
 
 export default function HeroSection({ onOpenDemandModal }) {
-  const { data: hero, loading } = useApi('/hero-section')
+  // এখানে response থেকে আসল ডেটাটা response.data এর ভেতরে থাকে
+  const { data: response, loading } = useApi('/hero-section')
+  
+  // আসল হিরো ডেটা বের করে নিচ্ছি
+  const hero = response?.data
+
+  // ১. কনসোলে চেক করার জন্য এই লাইনটি যুক্ত করো
+  console.log("Hero API Response:", response)
+  console.log("Extracted Hero Data:", hero)
+
+  // Laravel এর বেস URL বের করছি যাতে /uploads এর ছবিগুলো ঠিকমতো লোড হয়
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
+  const LARAVEL_URL = API_BASE_URL.replace('/api', '')
+
+  // API থেকে আসা আলাদা আলাদা ছবিগুলোকে একটি অ্যারেতে নিয়ে আসছি
+  const heroImages = [
+    hero?.image1 ? `${LARAVEL_URL}${hero.image1}` : null,
+    hero?.image2 ? `${LARAVEL_URL}${hero.image2}` : null,
+    hero?.image3 ? `${LARAVEL_URL}${hero.image3}` : null,
+    hero?.image4 ? `${LARAVEL_URL}${hero.image4}` : null
+  ].filter(Boolean) // null বা empty ভ্যালুগুলো বাদ দিচ্ছে
 
   if (loading) {
     return (
@@ -22,51 +42,69 @@ export default function HeroSection({ onOpenDemandModal }) {
       <div className="container">
         <div className="row align-items-center">
           <div className="col-lg-6 mb-5 mb-lg-0">
-            <h1 className="hero-title" dangerouslySetInnerHTML={{
-              __html: hero?.title || 'Your Gateway to<br>Global Workforce Solutions'
-            }} />
+            
+            {/* Title */}
+            <h1 
+              className="hero-title" 
+              dangerouslySetInnerHTML={{ 
+                __html: hero?.title || 'Your Gateway to<br>Global Workforce Solutions' 
+              }} 
+            />
+            
+            {/* Subtitle */}
             <p className="hero-subtitle">
               {hero?.subtitle ||
                 'Connecting skilled talents from Bangladesh to leading employers in Saudi Arabia and worldwide.'}
             </p>
 
+            {/* Badges */}
             <div className="hero-badges-container">
               <div className="hero-badge-pill">
-                <div className="badge-icon-gold"><i className="bi bi-patch-check-fill"></i></div>
-                <span>Bangladesh Licensed Recruiting Agency</span>
+                <div className="badge-icon-gold">
+                  <i className={hero?.badge1_icon || 'bi bi-patch-check-fill'}></i>
+                </div>
+                <span>
+                  {hero?.badge1_text || 'Bangladesh Licensed Recruiting Agency'}
+                </span>
               </div>
               <div className="hero-badge-pill">
-                <div className="badge-icon-green"><i className="bi bi-shield-lock-fill"></i></div>
-                <span>Saudi Arabia Licensed Service & Trading Company</span>
+                <div className="badge-icon-green">
+                  <i className={hero?.badge2_icon || 'bi bi-shield-lock-fill'}></i>
+                </div>
+                <span>
+                  {hero?.badge2_text || 'Saudi Arabia Licensed Service & Trading Company'}
+                </span>
               </div>
             </div>
 
+            {/* Buttons */}
             <div className="d-flex flex-wrap gap-3">
               <button
                 className="btn btn-brand-gold btn-lg px-4"
                 onClick={onOpenDemandModal}
               >
-                Hire Workers
+                {hero?.btn1_text || 'Hire Workers'}
               </button>
               <a href="/jobs" className="btn btn-outline-brand btn-lg px-4">
-                Explore Jobs
+                {hero?.btn2_text || 'Explore Jobs'}
               </a>
               <button
                 className="btn btn-sm btn-outline-light d-flex align-items-center gap-2 mt-2 mt-sm-0 px-3 d-none"
                 data-bs-toggle="modal"
                 data-bs-target="#trackerModal"
               >
-                <i className="bi bi-search"></i> Application Tracker
+                <i className="bi bi-search"></i> {hero?.btn3_text || 'Application Tracker'}
               </button>
             </div>
           </div>
 
+          {/* Images Section */}
           <div className="col-lg-6">
             <div className="hero-collage-grid">
-              {hero?.images?.length > 0
-                ? hero.images.map((img, i) => (
+              {heroImages.length > 0
+                ? heroImages.map((imgSrc, i) => (
                     <div key={i} className={`collage-item collage-${i + 1}`}>
-                      <img src={img.url} alt={img.alt || ''} className="collage-img" />
+                      <img src={imgSrc} alt={`Hero ${i + 1}`} className="collage-img" />
                     </div>
                   ))
                 : [1, 2, 3, 4].map((i) => (
@@ -82,6 +120,7 @@ export default function HeroSection({ onOpenDemandModal }) {
               }
             </div>
           </div>
+          
         </div>
       </div>
     </section>
