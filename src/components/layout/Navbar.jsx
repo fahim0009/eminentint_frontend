@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
+import { useApi } from '../../hooks/useApi'
 
 const navLinks = [
   { label: 'Home', path: '/' },
@@ -34,6 +35,15 @@ const navLinks = [
 export default function Navbar({ onOpenDemandModal }) {
   const [openDropdown, setOpenDropdown] = useState(null)
   const location = useLocation()
+  const { data: response } = useApi('/company-details')
+  const company = response?.data || {}
+
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
+  const LARAVEL_URL = API_BASE_URL.replace('/api', '/uploads/company')
+
+  const logoUrl = company.company_logo 
+    ? (company.company_logo.startsWith('http') ? company.company_logo : `${LARAVEL_URL}/${company.company_logo}`)
+    : '/assets/logo.svg' 
 
   const isActive = (path) => {
     if (path === '/') return location.pathname === '/'
@@ -44,7 +54,7 @@ export default function Navbar({ onOpenDemandModal }) {
     <nav className="navbar navbar-expand-xl main-navbar">
       <div className="container">
         <Link className="navbar-brand d-flex align-items-center" to="/">
-          <img src="/assets/logo.svg" alt="Eminent International Logo" className="brand-logo-img" />
+          <img src={logoUrl} alt={company.company_name || 'Eminent International Logo'} className="brand-logo-img" />
         </Link>
 
         <button
