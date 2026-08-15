@@ -1,17 +1,12 @@
 import { useRef, useState, useEffect } from 'react'
-
-const defaultPartners = [
-  { name: 'Al Yamama Contracting', icon: 'bi-building', color: 'primary', country: '🇸🇦 Saudi Arabia' },
-  { name: 'Al Falah Hospitality', icon: 'bi-cup-hot', color: 'warning', country: '🇸🇦 Saudi Arabia' },
-  { name: 'Al Yusr Facility Mgmt', icon: 'bi-tools', color: 'danger', country: '🇶🇦 Qatar' },
-  { name: 'Rapid Express LLC', icon: 'bi-truck', color: 'success', country: '🇦🇪 UAE' },
-  { name: 'Descon Operations', icon: 'bi-gear-fill', color: 'info', country: '🇴🇲 Oman' },
-  { name: 'Malta Ground Handling', icon: 'bi-airplane', color: 'primary', country: '🇲🇹 Malta (EU)' },
-  { name: 'Saudi Oger Tech', icon: 'bi-building-gear', color: 'secondary', country: '🇸🇦 Saudi Arabia' },
-  { name: 'CareFirst Healthcare', icon: 'bi-heart-pulse', color: 'danger', country: '🇵🇱 Poland (EU)' },
-]
+import { useApi } from '../../hooks/useApi'
 
 export default function PartnersSection() {
+  const { data: response, loading } = useApi('/partners')
+  
+  
+  const partners = Array.isArray(response) ? response : (response?.data || [])
+
   const trackRef = useRef(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(true)
@@ -28,7 +23,7 @@ export default function PartnersSection() {
     const el = trackRef.current
     if (el) el.addEventListener('scroll', checkScroll)
     return () => { if (el) el.removeEventListener('scroll', checkScroll) }
-  }, [])
+  }, [partners]) 
 
   const scroll = (direction) => {
     if (!trackRef.current) return
@@ -66,15 +61,37 @@ export default function PartnersSection() {
 
         <div className="partner-scroll-wrapper">
           <div ref={trackRef} className="partner-scroll-track">
-            {defaultPartners.map((partner, i) => (
-              <div key={i} className="partner-logo-card">
-                <div className={`partner-icon-badge bg-${partner.color} bg-opacity-10 text-${partner.color}`}>
-                  <i className={`bi ${partner.icon}`}></i>
+            {loading ? (
+              
+              Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="partner-logo-card">
+                  <div className="skeleton-pulse" style={{ width: '40px', height: '40px', borderRadius: '50%', margin: '0 auto 10px' }}></div>
+                  <div className="skeleton-pulse" style={{ height: '16px', width: '100px', margin: '0 auto' }}></div>
                 </div>
-                <div className="fw-bold text-navy fs-7">{partner.name}</div>
-                <span className="badge bg-light text-navy border mt-1">{partner.country}</span>
-              </div>
-            ))}
+              ))
+            ) : (
+              partners.map((partner) => {
+                
+                const iconClass = partner.icon_class?.startsWith('bi ') 
+                  ? partner.icon_class 
+                  : `bi ${partner.icon_class || 'bi-building'}`
+                
+                  
+                const colorName = partner.icon_color ? partner.icon_color.replace('text-', '') : 'primary'
+                
+                return (
+                  <div key={partner.id} className="partner-logo-card">
+                    <div className={`partner-icon-badge bg-${colorName} bg-opacity-10 ${partner.icon_color || 'text-primary'}`}>
+                      <i className={iconClass}></i>
+                    </div>
+                    <div className="fw-bold text-navy fs-7">{partner.name}</div>
+                    <span className="badge bg-light text-dark border mt-1">
+                      {partner.country_flag} {partner.country}
+                    </span>
+                  </div>
+                )
+              })
+            )}
           </div>
         </div>
       </div>

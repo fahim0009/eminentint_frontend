@@ -1,35 +1,20 @@
-const reviews = [
-  {
-    text: '"Eminent International supplied 250 skilled steel fixers and masons for our Riyadh megaproject within 35 days. Their trade testing center in Dhaka guarantees genuine skills."',
-    name: 'Engr. Abdullah Youssef',
-    role: 'Project Director, Al Yamama Contracting (KSA)',
-    initials: 'AY',
-    color: 'bg-navy',
-  },
-  {
-    text: '"Outstanding service! All 80 baristas, chefs, and waitstaff passed GAMCA medical checks and Saudi visa stamping without a single delay. Very professional team."',
-    name: 'Tariq Al-Falah',
-    role: 'Head of HR, Al Falah Catering (Jeddah, KSA)',
-    initials: 'AF',
-    color: 'bg-maroon',
-  },
-  {
-    text: '"Transparent recruitment partner. They handle BMET clearance and pre-departure orientation rigorously so workers arrive disciplined and project-ready."',
-    name: 'Sultan Al-Mansoori',
-    role: 'Operations Lead, Rapid Express LLC (Dubai, UAE)',
-    initials: 'RE',
-    color: 'bg-gold',
-  },
-  {
-    text: '"Direct Saudi Embassy visa stamping and zero hassle. Their dual Bangladesh RL and Saudi CR legal standing gives total peace of mind for bulk hiring."',
-    name: 'Marcus Vance',
-    role: 'Recruitment Director, Malta Ground Services (EU)',
-    initials: 'DO',
-    color: 'bg-green',
-  },
-]
+import { useApi } from '../../hooks/useApi'
+
+
+function getInitials(name) {
+  if (!name) return '';
+  const parts = name.trim().split(' ');
+  if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+  
+  return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+}
 
 export default function ReviewsSection() {
+  const { data: response, loading } = useApi('/testimonials')
+  
+  
+  const reviews = Array.isArray(response) ? response : (response?.data || [])
+
   return (
     <section className="section-padding bg-light">
       <div className="container">
@@ -42,27 +27,49 @@ export default function ReviewsSection() {
         </div>
 
         <div className="row g-4">
-          {reviews.map((review, i) => (
-            <div key={i} className="col-md-6 col-lg-3">
-              <div className="review-card">
-                <div>
-                  <div className="review-stars">
-                    {[...Array(5)].map((_, j) => (
-                      <i key={j} className="bi bi-star-fill"></i>
-                    ))}
-                  </div>
-                  <p className="review-text">{review.text}</p>
-                </div>
-                <div className="reviewer-profile">
-                  <div className={`reviewer-avatar ${review.color}`}>{review.initials}</div>
-                  <div>
-                    <div className="reviewer-name">{review.name}</div>
-                    <div className="reviewer-role">{review.role}</div>
+          {loading ? (
+            
+            Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="col-md-6 col-lg-3">
+                <div className="review-card">
+                  <div className="skeleton-pulse" style={{ height: '20px', width: '100px', marginBottom: '15px' }}></div>
+                  <div className="skeleton-pulse" style={{ height: '100px', marginBottom: '20px' }}></div>
+                  <div className="d-flex align-items-center gap-2">
+                    <div className="skeleton-pulse" style={{ width: '45px', height: '45px', borderRadius: '50%' }}></div>
+                    <div className="w-100">
+                      <div className="skeleton-pulse" style={{ height: '16px', width: '80%', marginBottom: '5px' }}></div>
+                      <div className="skeleton-pulse" style={{ height: '12px', width: '60%' }}></div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            reviews.map((review) => (
+              <div key={review.id} className="col-md-6 col-lg-3">
+                <div className="review-card">
+                  <div>
+                    <div className="review-stars">
+                      
+                      {[...Array(review.stars || 5)].map((_, j) => (
+                        <i key={j} className="bi bi-star-fill"></i>
+                      ))}
+                    </div>
+                    <p className="review-text">"{review.review_text}"</p>
+                  </div>
+                  <div className="reviewer-profile">
+                    <div className={`reviewer-avatar ${review.avatar_bg_color || 'bg-navy'}`}>
+                      {getInitials(review.reviewer_name)}
+                    </div>
+                    <div>
+                      <div className="reviewer-name">{review.reviewer_name}</div>
+                      <div className="reviewer-role">{review.reviewer_role}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </section>
