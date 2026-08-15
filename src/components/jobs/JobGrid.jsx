@@ -53,7 +53,7 @@ function JobCard({ job, onApply }) {
         <div>
           <button
             className="btn btn-brand-gold w-100"
-            onClick={() => onApply(job.title)}
+            onClick={() => onApply(job)} 
           >
             Apply Now
           </button>

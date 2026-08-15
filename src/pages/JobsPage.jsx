@@ -7,7 +7,7 @@ import { EmployerDemandModal, TrackerModal } from '../components/home/Modals'
 import JobBanner from '../components/jobs/JobBanner'
 import JobFilters from '../components/jobs/JobFilters'
 import JobGrid from '../components/jobs/JobGrid'
-import ApplyModal from '../components/jobs/ApplyModal'
+import CandidateApplyModal from '../components/jobs/CandidateApplyModal' 
 import { useApi } from '../hooks/useApi'
 
 export default function JobsPage() {
@@ -17,9 +17,9 @@ export default function JobsPage() {
   const [country, setCountry] = useState('all')
   const [industry, setIndustry] = useState('all')
   const [search, setSearch] = useState('')
-  const [selectedJobTitle, setSelectedJobTitle] = useState('')
-
-  // API data থেকে unique country আর industry বের করা
+   
+  const [selectedJob, setSelectedJob] = useState(null)
+ 
   const uniqueCountries = useMemo(() => {
     const set = new Set(jobs.map((j) => j.country))
     return Array.from(set).sort()
@@ -56,12 +56,8 @@ export default function JobsPage() {
     return items
   }, [jobs, country, industry, search])
 
-  const openApplyModal = (jobTitle) => {
-    setSelectedJobTitle(jobTitle || '')
-    setTimeout(() => {
-      const el = document.getElementById('candidateApplyModal')
-      if (el) window.bootstrap.Modal.getOrCreateInstance(el).show()
-    }, 50)
+  const handleApply = (job) => {
+    setSelectedJob(job) // পুরো জব অবজেক্টটি সেট করা হচ্ছে
   }
 
   const openTrackerModal = () => {
@@ -82,7 +78,13 @@ export default function JobsPage() {
     <>
       <TopBar />
       <Navbar onOpenDemandModal={openDemandModal} />
-      <JobBanner totalJobs={jobs.length} onOpenTracker={openTrackerModal} onOpenApply={openApplyModal} />
+      
+      <JobBanner 
+        totalJobs={jobs.length} 
+        onOpenTracker={openTrackerModal} 
+        onOpenApply={handleApply} 
+      />
+      
       <section className="section-padding">
         <div className="container">
           <JobFilters
@@ -95,10 +97,19 @@ export default function JobsPage() {
             countries={uniqueCountries}
             industries={uniqueIndustries}
           />
-          <JobGrid items={filteredJobs} loading={loading} onApply={openApplyModal} />
+          
+          <JobGrid items={filteredJobs} loading={loading} onApply={handleApply} />
         </div>
       </section>
-      <ApplyModal selectedJobTitle={selectedJobTitle} />
+
+
+      {selectedJob && (
+        <CandidateApplyModal 
+          selectedJob={selectedJob} 
+          onClose={() => setSelectedJob(null)} 
+        />
+      )}
+
       <Footer />
       <FloatingButtons />
       <EmployerDemandModal />

@@ -9,7 +9,7 @@ export default function JobBanner({ totalJobs, onOpenTracker, onOpenApply }) {
               Verified government recruitment demands for Saudi Arabia, Gulf & Europe. Direct employment with genuine companies.
             </p>
           </div>
-          <div className="col-lg-4 text-lg-end mt-3 mt-lg-0">
+          <div className="col-lg-4 text-lg-end mt-3 mt-lg-0 d-none">
             <div className="d-flex flex-column gap-2 align-items-lg-end">
               <span className="badge bg-gold text-navy fw-bold px-3 py-2 fs-6">
                 {totalJobs} Active Positions

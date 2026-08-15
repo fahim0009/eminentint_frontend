@@ -142,46 +142,43 @@ export function TrackerModal() {
 }
 
 export function EmployerDemandModal() {
-  const { postData, loading } = usePost('/employer-demand')
-  const [submitted, setSubmitted] = useState(false)
+  const { postData, loading } = usePost()
+  const [success, setSuccess] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     const form = e.target
+    
+    
     const payload = {
       company_name: form.emp_company.value,
       contact_person: form.emp_person.value,
       phone: form.emp_phone.value,
       email: form.emp_email.value,
-      country: form.emp_country.value,
+      destination_country: form.emp_country.value, 
       occupation: form.emp_occupation.value,
       quantity: form.emp_quantity.value,
       salary: form.emp_salary.value,
       accommodation: form.emp_accommodation.value,
     }
 
-    postData(payload)
-      .then(() => setSubmitted(true))
-      .catch(() => {})
+    try {
+      await postData('/employer-demand', payload)
+      setSuccess(true)
+      form.reset()
+    } catch (err) {
+      console.error('Demand submission failed', err)
+    }
   }
 
-  if (submitted) {
-    return (
-      <div className="modal fade show d-block" tabIndex="-1" style={{ background: 'rgba(0,0,0,0.5)' }}>
-        <div className="modal-dialog modal-dialog-centered">
-          <div className="modal-content text-center p-5">
-            <div className="text-success mb-3">
-              <i className="bi bi-check-circle-fill display-1"></i>
-            </div>
-            <h4 className="fw-bold text-navy">Demand Request Submitted!</h4>
-            <p className="text-muted">Our recruitment team will contact you within 24 hours.</p>
-            <button className="btn btn-brand-navy px-4" onClick={() => setSubmitted(false)}>
-              Close
-            </button>
-          </div>
-        </div>
-      </div>
-    )
+  const handleClose = () => {
+    setSuccess(false)
+    
+    const modalEl = document.getElementById('employerDemandModal')
+    if (modalEl && window.bootstrap) {
+      const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl)
+      modal.hide()
+    }
   }
 
   return (
@@ -192,73 +189,88 @@ export function EmployerDemandModal() {
             <h5 className="modal-title fw-bold">
               <i className="bi bi-building me-2 text-gold"></i> Submit Worker Demand Requirement
             </h5>
-            <button type="button" className="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            <button type="button" className="btn-close btn-close-white" onClick={handleClose}></button>
           </div>
           <div className="modal-body p-4">
-            <form id="employer-demand-form" onSubmit={handleSubmit}>
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label className="form-label fw-bold">Company / Employer Name *</label>
-                  <input type="text" name="emp_company" className="form-control" placeholder="e.g. Al Yamama Construction KSA" required />
+            
+            
+            {success ? (
+              <div className="text-center p-5">
+                <div className="text-success mb-3">
+                  <i className="bi bi-check-circle-fill display-1"></i>
                 </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-bold">Contact Person Name *</label>
-                  <input type="text" name="emp_person" className="form-control" placeholder="e.g. Sheikh Abdullah / HR Manager" required />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-bold">Mobile / WhatsApp Number *</label>
-                  <input type="tel" name="emp_phone" className="form-control" placeholder="+966 5X XXX XXXX" required />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-bold">Official Email Address *</label>
-                  <input type="email" name="emp_email" className="form-control" placeholder="hr@company.com" required />
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-bold">Destination Country</label>
-                  <select name="emp_country" className="form-select">
-                    <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
-                    <option value="UAE">🇦🇪 United Arab Emirates</option>
-                    <option value="Qatar">🇶🇦 Qatar</option>
-                    <option value="Oman">🇴🇲 Oman</option>
-                    <option value="Malta">🇲🇹 Malta (Europe)</option>
-                    <option value="Poland">🇵🇱 Poland (Europe)</option>
-                    <option value="Malaysia">🇲🇾 Malaysia</option>
-                  </select>
-                </div>
-                <div className="col-md-6">
-                  <label className="form-label fw-bold">Required Worker Trade / Occupation</label>
-                  <input type="text" name="emp_occupation" className="form-control" placeholder="e.g. Barista / Electrician / General Cleaner" />
-                </div>
-                <div className="col-md-4">
-                  <label className="form-label fw-bold">Worker Quantity Required</label>
-                  <input type="number" name="emp_quantity" className="form-control" placeholder="e.g. 50" />
-                </div>
-                <div className="col-md-4">
-                  <label className="form-label fw-bold">Offered Monthly Salary (SAR / Local)</label>
-                  <input type="text" name="emp_salary" className="form-control" placeholder="e.g. 1800 SAR + Food" />
-                </div>
-                <div className="col-md-4">
-                  <label className="form-label fw-bold">Accommodation Provided?</label>
-                  <select name="emp_accommodation" className="form-select">
-                    <option value="Yes - Provided by Employer">Yes - Free Accommodation</option>
-                    <option value="No - Allowance Included">No - Allowance Included</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mt-4 text-end">
-                <button type="button" className="btn btn-secondary me-2" data-bs-dismiss="modal">Cancel</button>
-                <button type="submit" className="btn btn-brand-gold px-4" disabled={loading}>
-                  {loading ? (
-                    <>
-                      <span className="spinner-border spinner-border-sm me-2"></span>
-                      Submitting...
-                    </>
-                  ) : (
-                    'Submit Demand Request'
-                  )}
+                <h4 className="fw-bold text-navy">Demand Request Submitted!</h4>
+                <p className="text-muted">Our recruitment team will contact you within 24 hours.</p>
+                <button className="btn btn-brand-navy px-4 mt-3" onClick={handleClose}>
+                  Close
                 </button>
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSubmit}>
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Company / Employer Name *</label>
+                    <input type="text" name="emp_company" className="form-control" placeholder="e.g. Al Yamama Construction KSA" required />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Contact Person Name *</label>
+                    <input type="text" name="emp_person" className="form-control" placeholder="e.g. Sheikh Abdullah / HR Manager" required />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Mobile / WhatsApp Number *</label>
+                    <input type="tel" name="emp_phone" className="form-control" placeholder="+966 5X XXX XXXX" required />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Official Email Address *</label>
+                    <input type="email" name="emp_email" className="form-control" placeholder="hr@company.com" required />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Destination Country</label>
+                    <select name="emp_country" className="form-select">
+                      <option value="Saudi Arabia">🇸🇦 Saudi Arabia</option>
+                      <option value="UAE">🇦🇪 United Arab Emirates</option>
+                      <option value="Qatar">🇶🇦 Qatar</option>
+                      <option value="Oman">🇴🇲 Oman</option>
+                      <option value="Malta">🇲🇹 Malta (Europe)</option>
+                      <option value="Poland">🇵🇱 Poland (Europe)</option>
+                      <option value="Malaysia">🇲🇾 Malaysia</option>
+                    </select>
+                  </div>
+                  <div className="col-md-6">
+                    <label className="form-label fw-bold">Required Worker Trade / Occupation</label>
+                    <input type="text" name="emp_occupation" className="form-control" placeholder="e.g. Barista / Electrician / General Cleaner" />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label fw-bold">Worker Quantity Required</label>
+                    <input type="number" name="emp_quantity" className="form-control" placeholder="e.g. 50" />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label fw-bold">Offered Monthly Salary (SAR / Local)</label>
+                    <input type="text" name="emp_salary" className="form-control" placeholder="e.g. 1800 SAR + Food" />
+                  </div>
+                  <div className="col-md-4">
+                    <label className="form-label fw-bold">Accommodation Provided?</label>
+                    <select name="emp_accommodation" className="form-select">
+                      <option value="Yes - Provided by Employer">Yes - Free Accommodation</option>
+                      <option value="No - Allowance Included">No - Allowance Included</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="mt-4 text-end">
+                  <button type="button" className="btn btn-secondary me-2" onClick={handleClose}>Cancel</button>
+                  <button type="submit" className="btn btn-brand-gold px-4" disabled={loading}>
+                    {loading ? (
+                      <>
+                        <span className="spinner-border spinner-border-sm me-2"></span>
+                        Submitting...
+                      </>
+                    ) : (
+                      'Submit Demand Request'
+                    )}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       </div>
