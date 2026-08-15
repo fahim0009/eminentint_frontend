@@ -26,7 +26,7 @@ const navLinks = [
   },
   { label: 'Countries', path: '/countries' },
   { label: 'Industries', path: '/industries' },
-  { label: 'For Employers', path: '/employers' },
+  { label: 'Employers', path: '/employers' },
   { label: 'Jobs', path: '/jobs' },
   { label: 'Gallery', path: '/gallery' },
   { label: 'Contact', path: '/contact' },
@@ -106,7 +106,7 @@ export default function Navbar({ onOpenDemandModal }) {
             )}
           </ul>
 
-          <div className="d-flex align-items-center gap-2">
+          <div className="d-flex align-items-center gap-2 d-none">
             <Link to="/jobs" className="btn btn-brand-navy">Apply for Job</Link>
             <button
               className="btn btn-brand-gold"
