@@ -1,27 +1,20 @@
 import { useApi } from '../../hooks/useApi'
 
 export default function HeroSection({ onOpenDemandModal }) {
-  // এখানে response থেকে আসল ডেটাটা response.data এর ভেতরে থাকে
-  const { data: response, loading } = useApi('/hero-section')
   
-  // আসল হিরো ডেটা বের করে নিচ্ছি
+  const { data: response, loading } = useApi('/hero-section')
   const hero = response?.data
-
-  // ১. কনসোলে চেক করার জন্য এই লাইনটি যুক্ত করো
-  console.log("Hero API Response:", response)
-  console.log("Extracted Hero Data:", hero)
-
-  // Laravel এর বেস URL বের করছি যাতে /uploads এর ছবিগুলো ঠিকমতো লোড হয়
+  
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
   const LARAVEL_URL = API_BASE_URL.replace('/api', '')
 
-  // API থেকে আসা আলাদা আলাদা ছবিগুলোকে একটি অ্যারেতে নিয়ে আসছি
+  
   const heroImages = [
     hero?.image1 ? `${LARAVEL_URL}${hero.image1}` : null,
     hero?.image2 ? `${LARAVEL_URL}${hero.image2}` : null,
     hero?.image3 ? `${LARAVEL_URL}${hero.image3}` : null,
     hero?.image4 ? `${LARAVEL_URL}${hero.image4}` : null
-  ].filter(Boolean) // null বা empty ভ্যালুগুলো বাদ দিচ্ছে
+  ].filter(Boolean) 
 
   if (loading) {
     return (

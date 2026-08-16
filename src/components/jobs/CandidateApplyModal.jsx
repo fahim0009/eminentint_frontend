@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios' // এই লাইনটি যুক্ত করা হয়েছে
+import axios from 'axios'
 
 export default function CandidateApplyModal({ selectedJob, onClose }) {
   const [loading, setLoading] = useState(false)
@@ -10,7 +10,6 @@ export default function CandidateApplyModal({ selectedJob, onClose }) {
     const form = e.target
     setLoading(true)
 
-    // FormData ব্যবহার করা হচ্ছে কারণ ফাইল আপলোড করতে হবে
     const formData = new FormData()
     formData.append('full_name', form.full_name.value)
     formData.append('passport_number', form.passport_number.value)
@@ -33,12 +32,10 @@ export default function CandidateApplyModal({ selectedJob, onClose }) {
       formData.append('cv_file', form.cv_file.files[0])
     }
 
-    // API URL তৈরি করা
     const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api'
     const url = `${API_BASE_URL}/candidate-apply`
 
     try {
-      // সরাসরি axios ব্যবহার করা হচ্ছে
       const res = await axios.post(url, formData)
       setSuccessData(res.data)
       form.reset()
@@ -46,7 +43,6 @@ export default function CandidateApplyModal({ selectedJob, onClose }) {
       console.error('Full Error Object:', err)
       
       if (err.response) {
-        // সার্ভার থেকে এরর এসেছে (যেমন: 422 বা 500)
         const errorData = err.response.data
         if (errorData && errorData.errors) {
           const errorMessages = Object.values(errorData.errors).flat().join('\n')
@@ -55,10 +51,8 @@ export default function CandidateApplyModal({ selectedJob, onClose }) {
           alert(errorData?.message || 'Server returned an error.')
         }
       } else if (err.request) {
-        // রিকোয়েস্ট গেছে কিন্তু সার্ভার থেকে কোনো রেসপন্স আসেনি
         alert('No response from server. Is the Laravel server running? Or is it a CORS issue?')
       } else {
-        // রিকোয়েস্ট সেটআপ করার সময়ই এরর হয়েছে
         alert('Error setting up request: ' + err.message)
       }
     } finally {
@@ -104,7 +98,7 @@ export default function CandidateApplyModal({ selectedJob, onClose }) {
                 <div className="row g-3">
                   <div className="col-md-6">
                     <label className="form-label fw-bold">Full Candidate Name (as per Passport) *</label>
-                    <input type="text" name="full_name" className="form-control" placeholder="e.g. MD. SHAHIN ALAM" required />
+                    <input type="text" name="full_name" className="form-control" placeholder="" required />
                   </div>
                   <div className="col-md-6">
                     <label className="form-label fw-bold">Passport Number *</label>

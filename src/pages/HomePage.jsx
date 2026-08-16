@@ -17,17 +17,8 @@ import Footer from '../components/layout/Footer'
 export default function HomePage() {
   const [demandModalOpen, setDemandModalOpen] = useState(false)
 
-  const openDemandModal = () => {
-    setDemandModalOpen(true)
-    // Bootstrap modal needs a small delay to find the DOM element
-    setTimeout(() => {
-      const modalEl = document.getElementById('employerDemandModal')
-      if (modalEl) {
-        const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl)
-        modal.show()
-      }
-    }, 50)
-  }
+  const openDemandModal = () => setDemandModalOpen(true)
+  const closeDemandModal = () => setDemandModalOpen(false)
 
   return (
     <>
@@ -45,7 +36,12 @@ export default function HomePage() {
       <Footer />
       <FloatingButtons />
       <TrackerModal />
-      <EmployerDemandModal />
+      
+      
+      <EmployerDemandModal 
+        isOpen={demandModalOpen} 
+        onClose={closeDemandModal} 
+      />
     </>
   )
 }

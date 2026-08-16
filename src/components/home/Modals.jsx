@@ -13,7 +13,6 @@ export function TrackerModal() {
     setSearching(true)
     setResult(null)
 
-    // Replace with actual API call when endpoint is ready
     setTimeout(() => {
       if (query.toUpperCase() === 'A12345678') {
         setResult({
@@ -141,21 +140,19 @@ export function TrackerModal() {
   )
 }
 
-export function EmployerDemandModal() {
+export function EmployerDemandModal({ isOpen, onClose }) {
   const { postData, loading } = usePost()
   const [success, setSuccess] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     const form = e.target
-    
-    
     const payload = {
       company_name: form.emp_company.value,
       contact_person: form.emp_person.value,
       phone: form.emp_phone.value,
       email: form.emp_email.value,
-      destination_country: form.emp_country.value, 
+      destination_country: form.emp_country.value,
       occupation: form.emp_occupation.value,
       quantity: form.emp_quantity.value,
       salary: form.emp_salary.value,
@@ -168,21 +165,24 @@ export function EmployerDemandModal() {
       form.reset()
     } catch (err) {
       console.error('Demand submission failed', err)
+      alert('Something went wrong. Please try again.')
     }
   }
 
   const handleClose = () => {
     setSuccess(false)
-    
-    const modalEl = document.getElementById('employerDemandModal')
-    if (modalEl && window.bootstrap) {
-      const modal = window.bootstrap.Modal.getOrCreateInstance(modalEl)
-      modal.hide()
-    }
+    onClose()
   }
 
+  
+  if (!isOpen) return null
+
   return (
-    <div className="modal fade" id="employerDemandModal" tabIndex="-1">
+    <div 
+      className="modal fade show d-block" 
+      tabIndex="-1" 
+      style={{ background: 'rgba(0,0,0,0.5)' }}
+    >
       <div className="modal-dialog modal-lg modal-dialog-centered">
         <div className="modal-content">
           <div className="modal-header bg-navy text-white" style={{ backgroundColor: '#113045' }}>
@@ -192,7 +192,6 @@ export function EmployerDemandModal() {
             <button type="button" className="btn-close btn-close-white" onClick={handleClose}></button>
           </div>
           <div className="modal-body p-4">
-            
             
             {success ? (
               <div className="text-center p-5">
